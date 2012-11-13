@@ -1,0 +1,6 @@
+﻿.block .content .mymentees_pic .userpicture{width:32px;height:32px;padding:2px;}
+.mymentees_mentee{overflow:hidden;}
+.mymentees_pic{float:left;}
+.mymentees_grades{border-style:none;background-color:transparent;background-repeat:no-repeat;background-position:bottom;color:transparent;cursor:pointer;height:16px;width:11px;margin:0;padding:0;}
+.mymentees_online{color:#0f0;}
+.mymentees_offline{color:#f00;}
