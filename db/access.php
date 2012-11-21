@@ -15,18 +15,38 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Blog tags block caps.
  *
- * @package    block
- * @subpackage mymentees
+ * @package   block_enrol_duration
  * @copyright  2012 Nathan Robbins (https://github.com/nrobbins)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012111800;         // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011112900;         // Requires this Moodle version
-$plugin->component = 'block_mymentees';  // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "1";              // User-friendly version number
+$capabilities = array(
+    'block/mymentees:myaddinstance' => array(
+        'riskbitmask' => '',
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/my:manageblocks'
+    ),
+
+    'block/mymentees:addinstance' => array(
+        'riskbitmask' => '',
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
+);

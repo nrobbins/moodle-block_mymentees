@@ -26,3 +26,5 @@ $string['configtitle'] = 'Block title';
 $string['pluginname'] = 'My mentees';
 $string['online'] = 'Online';
 $string['offline'] = 'Offline';
+$string['mymentees:addinstance'] = 'Add a My mentees block';
+$string['mymentees:myaddinstance'] = 'Add a My mentees block to My Moodle';
