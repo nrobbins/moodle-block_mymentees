@@ -24,11 +24,26 @@
 defined('MOODLE_INTERNAL') || die();
 
 class block_mymentees_edit_form extends block_edit_form {
+    private $opts = array(
+        'showavatar' => true,
+        'showforumicon' => true,
+        'showblogicon' => true,
+        'showmsgicon' => true,
+        'showonlineicon' => true,
+        'showinlinestats' => false,
+    );
+
     protected function specific_definition($mform) {
         // Fields for editing HTML block title and contents.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
         $mform->addElement('text', 'config_title', get_string('configtitle', 'block_mymentees'));
         $mform->setType('config_title', PARAM_MULTILANG);
+
+        foreach ($this->opts as $opt) {
+            $mform->addElement('advcheckbox', 'config_'.$opt, get_string($opt, 'block_mymentees'));
+            $mform->setDefault('config_'.$opt, $value);
+            $mform->setType("config_".$opt, PARAM_BOOL);
+        }
     }
 }

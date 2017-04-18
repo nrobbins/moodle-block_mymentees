@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 class block_mymentees extends block_base {
-
     public function init() {
         $this->title = get_string('pluginname', 'block_mymentees');
     }
@@ -63,20 +62,15 @@ class block_mymentees extends block_base {
                                                AND c.instanceid = u.id
                                                AND c.contextlevel = '.CONTEXT_USER, array($userid));
 
-            $divconfig = array();
+            $divconfig = (array)$this->config;
+
+            $canSendMessages = (has_capability('moodle/site:sendmessage', $this->page->context) && !empty($CFG->messaging));
+            $canShowBlog = ($CFG->bloglevel > 0);
+            $divconfig['showmsgicon'] = $divconfig['showmsgicon'] && $canSendMessages;
+            $divconfig['showblogicon'] = $divconfig['showblogicon'] && $canShowBlog;
 
             $timetoshowusers = 300;
             $divconfig['timefrom'] = 100 * floor((time()-$timetoshowusers) / 100);
-
-            $divconfig['showmsg'] = false;
-            $divconfig['showblog'] = false;
-
-            if (has_capability('moodle/site:sendmessage', $this->page->context) && !empty($CFG->messaging)) {
-                $divconfig['showmsg'] = true;
-            }
-            if ($CFG->bloglevel > 0) {
-                $divconfig['showblog'] = true;
-            }
 
             foreach ($mentees as $record) {
                 $mentee_div = new block_mymentees_mentee_element($record, $CFG, $OUTPUT, $divconfig);
@@ -92,9 +86,6 @@ class block_mymentees extends block_base {
 }
 
 class block_mymentees_mentee_element {
-    private $canshowblog = false;
-    private $canshowmsgicon = false;
-
     private $record = null;
 
     private $CFG;
@@ -104,19 +95,17 @@ class block_mymentees_mentee_element {
 
     public function __construct($record, $CFG, $OUTPUT, $config) {
         $this->record = $record;
-        $this->canshowblog = $canshowblog;
-        $this->canshowmsgicon = $canshowmsgicon;
 
         $this->CFG = $CFG;
         $this->OUTPUT = $OUTPUT;
 
         $this->config = array(
-            'showpic'  => isset($config['showpic'])  ? $config['showpic']  : true,
+            'showpic'  => isset($config['showavatar'])  ? $config['showavatar']  : true,
             'showgrad' => isset($config['showgrad']) ? $config['showgrad'] : true,
-            'showfrm'  => isset($config['showfrm'])  ? $config['showfrm']  : true,
-            'showblog' => isset($config['showblog']) ? $config['showblog'] : false,
-            'showmsg'  => isset($config['showmsg'])  ? $config['showmsg']  : false,
-            'showdot'  => isset($config['showdot'])  ? $config['showdot']  : true,
+            'showfrm'  => isset($config['showforumicon'])  ? $config['showforumicon']  : true,
+            'showblog' => isset($config['showblogicon']) ? $config['showblogicon'] : false,
+            'showmsg'  => isset($config['showmsgicon'])  ? $config['showmsgicon']  : false,
+            'showdot'  => isset($config['showonlineicon'])  ? $config['showonlineicon']  : true,
             'timefrom' => isset($config['timefrom']) ? $config['timefrom'] : 0,
         );
     }
