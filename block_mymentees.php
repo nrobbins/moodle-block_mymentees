@@ -156,32 +156,32 @@ class block_mymentees_mentee_element {
                              $gradelinkcontents.'</form>';
     }
     private function mentee_forum() {
-        $postlinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('icon', 'forum').'" alt="'.
-                             get_string('forumposts', 'forum') .'" />';
-        return '<a href="'.$this->CFG->wwwroot.'/mod/forum/user.php?id='.$this->record->id.'" title="'.
-                             get_string('forumposts', 'forum') .'">'.$postlinkcontents.'</a>';
+        $title = get_string('forumposts', 'forum');
+        $link = $this->icon($this->OUTPUT->pix_url('icon', 'forum'), $title);
+        return $this->link('/mod/forum/user.php?id='.$this->record->id, $title, $link);
     }
     private function mentee_blog() {
-        $bloglinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('i/feedback') . '" alt="'.
-                             get_string('blogentries', 'blog') .'" />';
-        return '<a class="mymentees_msg" href="'.$this->CFG->wwwroot.'/blog/index.php?userid='.$this->record->id.
-                             '" title="'.get_string('blogentries', 'blog').'">'.$bloglinkcontents .'</a>';
+        $title = get_string('blogentries', 'blog');
+        $link = $this->icon($this->OUTPUT->pix_url('i/feedback'), $title);
+        return $this->link('/blog/index.php?userid='.$this->record->id, $title, $link);
     }
     private function mentee_messages() {
-        $msglinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/message') . '" alt="'.
-                             get_string('messageselectadd') .'" />';
-        return '<a class="mymentees_msg" href="'.$this->CFG->wwwroot.'/message/index.php?id='.$this->record->id.
-                             '" title="'.get_string('messageselectadd').'">'.$msglinkcontents .'</a>';
+        $title = get_string('messageselectadd');
+        $link = $this->icon($this->OUTPUT->pix_url('t/message'), $title);
+        return $this->link('/message/index.php?id='.$this->record->id, $title, $link);
     }
     private function mentee_online() {
         if ($this->record->lastaccess > $this->config['timefrom']) {
-            return '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/go') . '" alt="'.
-                                 get_string('online', 'block_mymentees')
-                                 .'" title="'.get_string('online', 'block_mymentees').'" />';
+            return $this->icon($this->OUTPUT->pix_url('t/go'), get_string('online', 'block_mymentees'));
         } else {
-            return '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/stop') . '" alt="'.
-                                 get_string('offline', 'block_mymentees')
-                                 .'" title="'.get_string('offline', 'block_mymentees').'" />';
+            return $this->icon($this->OUTPUT->pix_url('t/stop'), get_string('offline', 'block_mymentees'));
         }
+    }
+
+    private function icon($icon, $title='') {
+        return "<img class='iconsmall' src='{$icon}' alt='{$title}' title='{$title}' />";
+    }
+    private function link($href, $title, $innerHTML) {
+        return "<a class='mymentees_msg' href='{$this->CFG->wwwroot}{$href}' title='{$title}'>{$innerHTML}</a>";
     }
 }
