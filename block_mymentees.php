@@ -63,70 +63,125 @@ class block_mymentees extends block_base {
                                                AND c.instanceid = u.id
                                                AND c.contextlevel = '.CONTEXT_USER, array($userid));
 
-            $timetoshowusers = 300;
-            $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
+            $divconfig = array();
 
-            $canshowmsgicon = false;
-            $canshowblog = false;
+            $timetoshowusers = 300;
+            $divconfig['timefrom'] = 100 * floor((time()-$timetoshowusers) / 100);
+
+            $divconfig['showmsg'] = false;
+            $divconfig['showblog'] = false;
 
             if (has_capability('moodle/site:sendmessage', $this->page->context) && !empty($CFG->messaging)) {
-                $canshowmsgicon = true;
+                $divconfig['showmsg'] = true;
             }
             if ($CFG->bloglevel > 0) {
-                $canshowblog = true;
+                $divconfig['showblog'] = true;
             }
 
             foreach ($mentees as $record) {
-                $this->content->text .= '<div class="mymentees_mentee">';
-                $this->content->text .= '<div class="mymentees_pic">'.$OUTPUT->user_picture($record, array('size'=>30)).'</div>';
-                $this->content->text .= '<div class="mymentees_name"><a href="'.$CFG->wwwroot.'/user/view.php?id='.
-                                        $record->instanceid.'&amp;course='.SITEID.'">'.fullname($record).'</a></div>';
-                $this->content->text .= '<div>';
-
-                $gradelinkcontents = '<input type="hidden" name="studentid" value="'.$record->id.'">'.
-                                     '<input type="submit" class="mymentees_grades" value="" style="background-image:url('.
-                                     $OUTPUT->pix_url('t/grades').');" title="'.get_string('grades').'">';
-                $gradelink = '<form action="'.$CFG->wwwroot.'/blocks/mymentees/grades.php" method="post" style="display:inline">'.
-                                         $gradelinkcontents.'</form>';
-                $this->content->text .= $gradelink.' | ';
-
-                $postlinkcontents = '<img class="iconsmall" src="'.$OUTPUT->pix_url('icon', 'forum').'" alt="'.
-                                         get_string('forumposts', 'forum') .'" />';
-                $postlink = '<a href="'.$CFG->wwwroot.'/mod/forum/user.php?id='.$record->id.'" title="'.
-                                         get_string('forumposts', 'forum') .'">'.$postlinkcontents.'</a>';
-                $this->content->text .= $postlink.' | ';
-
-                if ($canshowblog) {
-                    $bloglinkcontents = '<img class="iconsmall" src="'.$OUTPUT->pix_url('i/feedback') . '" alt="'.
-                                         get_string('blogentries', 'blog') .'" />';
-                    $bloglink = '<a class="mymentees_msg" href="'.$CFG->wwwroot.'/blog/index.php?userid='.$record->id.
-                                         '" title="'.get_string('blogentries', 'blog').'">'.$bloglinkcontents .'</a>';
-                    $this->content->text .= $bloglink.' | ';
-                }
-
-                if ($canshowmsgicon) {
-                    $msglinkcontents = '<img class="iconsmall" src="'.$OUTPUT->pix_url('t/message') . '" alt="'.
-                                         get_string('messageselectadd') .'" />';
-                    $msglink = '<a class="mymentees_msg" href="'.$CFG->wwwroot.'/message/index.php?id='.$record->id.
-                                         '" title="'.get_string('messageselectadd').'">'.$msglinkcontents .'</a>';
-
-                    $this->content->text .= $msglink.' | ';
-                }
-                if ($record->lastaccess > $timefrom) {
-                    $this->content->text .= '<img class="iconsmall" src="'.$OUTPUT->pix_url('t/go') . '" alt="'.
-                                         get_string('online', 'block_mymentees').
-                                         '" title="'.get_string('online', 'block_mymentees').'" />';
-                } else {
-                    $this->content->text .= '<img class="iconsmall" src="'.$OUTPUT->pix_url('t/stop') . '" alt="'.
-                                         get_string('offline', 'block_mymentees')
-                                         .'" title="'.get_string('offline', 'block_mymentees').'" />';
-                }
-                $this->content->text .= '</div></div>';
+                $mentee_div = new block_mymentees_mentee_element($record, $CFG, $OUTPUT, $divconfig);
+                $this->content->text .= $mentee_div->get_output();
             }
         }
 
         $this->content->footer = '';
 
         return $this->content;
+    }
+
+}
+
+class block_mymentees_mentee_element {
+    private $canshowblog = false;
+    private $canshowmsgicon = false;
+
+    private $record = null;
+
+    private $CFG;
+    private $OUTPUT;
+
+    private $config = array();
+
+    public function __construct($record, $CFG, $OUTPUT, $config) {
+        $this->record = $record;
+        $this->canshowblog = $canshowblog;
+        $this->canshowmsgicon = $canshowmsgicon;
+
+        $this->CFG = $CFG;
+        $this->OUTPUT = $OUTPUT;
+
+        $this->config = array(
+            'showpic'  => isset($config['showpic'])  ? $config['showpic']  : true,
+            'showgrad' => isset($config['showgrad']) ? $config['showgrad'] : true,
+            'showfrm'  => isset($config['showfrm'])  ? $config['showfrm']  : true,
+            'showblog' => isset($config['showblog']) ? $config['showblog'] : false,
+            'showmsg'  => isset($config['showmsg'])  ? $config['showmsg']  : false,
+            'showdot'  => isset($config['showdot'])  ? $config['showdot']  : true,
+            'timefrom' => isset($config['timefrom']) ? $config['timefrom'] : 0,
+        );
+    }
+
+    public function get_output() {
+        $out = '';
+        $out .= '<div class="mymentees_mentee">';
+        $out .= $this->mentee_pic();
+        $out .= $this->mentee_name();
+
+        $icons = array(
+            $this->config['showgrad'] ? $this->mentee_grades() : '',
+            $this->config['showfrm']  ? $this->mentee_forum() : '',
+            $this->config['showblog'] ? $this->mentee_blog() : '',
+            $this->config['showmsg']  ? $this->mentee_messages() : '',
+            $this->config['showdot']  ? $this->mentee_online() : '',
+        );
+
+        $out .= "<div>" . implode(' | ', array_filter($icons)) . "</div>";
+        $out .= '</div>';
+        return $out;
+    }
+
+    private function mentee_pic() {
+        return '<div class="mymentees_pic">'.$this->OUTPUT->user_picture($this->record, array('size'=>30)).'</div>';
+    }
+    private function mentee_name() {
+        global $CFG;
+        return '<div class="mymentees_name"><a href="'.$this->CFG->wwwroot.'/user/view.php?id='.
+                            $this->record->instanceid.'&amp;course='.SITEID.'">'.fullname($this->record).'</a></div>';
+    }
+    private function mentee_grades() {
+        $gradelinkcontents = '<input type="hidden" name="studentid" value="'.$this->record->id.'">'.
+                             '<input type="submit" class="mymentees_grades" value="" style="background-image:url('.
+                             $this->OUTPUT->pix_url('t/grades').');" title="'.get_string('grades').'">';
+        return '<form action="'.$this->CFG->wwwroot.'/blocks/mymentees/grades.php" method="post" style="display:inline">'.
+                             $gradelinkcontents.'</form>';
+    }
+    private function mentee_forum() {
+        $postlinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('icon', 'forum').'" alt="'.
+                             get_string('forumposts', 'forum') .'" />';
+        return '<a href="'.$this->CFG->wwwroot.'/mod/forum/user.php?id='.$this->record->id.'" title="'.
+                             get_string('forumposts', 'forum') .'">'.$postlinkcontents.'</a>';
+    }
+    private function mentee_blog() {
+        $bloglinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('i/feedback') . '" alt="'.
+                             get_string('blogentries', 'blog') .'" />';
+        return '<a class="mymentees_msg" href="'.$this->CFG->wwwroot.'/blog/index.php?userid='.$this->record->id.
+                             '" title="'.get_string('blogentries', 'blog').'">'.$bloglinkcontents .'</a>';
+    }
+    private function mentee_messages() {
+        $msglinkcontents = '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/message') . '" alt="'.
+                             get_string('messageselectadd') .'" />';
+        return '<a class="mymentees_msg" href="'.$this->CFG->wwwroot.'/message/index.php?id='.$this->record->id.
+                             '" title="'.get_string('messageselectadd').'">'.$msglinkcontents .'</a>';
+    }
+    private function mentee_online() {
+        if ($record->lastaccess > $timefrom) {
+            return '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/go') . '" alt="'.
+                                 get_string('online', 'block_mymentees').
+                                 '" title="'.get_string('online', 'block_mymentees').'" />';
+        } else {
+            return '<img class="iconsmall" src="'.$this->OUTPUT->pix_url('t/stop') . '" alt="'.
+                                 get_string('offline', 'block_mymentees')
+                                 .'" title="'.get_string('offline', 'block_mymentees').'" />';
+        }
     }
 }
