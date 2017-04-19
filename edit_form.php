@@ -40,10 +40,13 @@ class block_mymentees_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_title', get_string('configtitle', 'block_mymentees'));
         $mform->setType('config_title', PARAM_MULTILANG);
 
-        foreach ($this->opts as $opt) {
+        foreach ($this->opts as $opt=>$value) {
             $mform->addElement('advcheckbox', 'config_'.$opt, get_string($opt, 'block_mymentees'));
             $mform->setDefault('config_'.$opt, $value);
             $mform->setType("config_".$opt, PARAM_BOOL);
         }
+
+        $mform->addElement('text', 'config_separator', get_string('configseparator', 'block_mymentees'));
+        $mform->setDefault('config_separator', ' | ');
     }
 }

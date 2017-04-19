@@ -73,7 +73,7 @@ class block_mymentees extends block_base {
             $divconfig['timefrom'] = 100 * floor((time()-$timetoshowusers) / 100);
 
             foreach ($mentees as $record) {
-                $mentee_div = new block_mymentees_mentee_element($record, $CFG, $OUTPUT, $divconfig);
+                $mentee_div = new block_mymentees_mentee_element($record, $CFG, $OUTPUT, $DB, $divconfig);
                 $this->content->text .= $mentee_div->get_output();
             }
         }
@@ -90,14 +90,16 @@ class block_mymentees_mentee_element {
 
     private $CFG;
     private $OUTPUT;
+    private $DB;
 
     private $config = array();
 
-    public function __construct($record, $CFG, $OUTPUT, $config) {
+    public function __construct($record, $CFG, $OUTPUT, $DB, $config) {
         $this->record = $record;
 
         $this->CFG = $CFG;
         $this->OUTPUT = $OUTPUT;
+        $this->DB = $DB;
 
         $this->config = array(
             'showpic'  => isset($config['showavatar'])  ? $config['showavatar']  : true,
@@ -106,6 +108,8 @@ class block_mymentees_mentee_element {
             'showblog' => isset($config['showblogicon']) ? $config['showblogicon'] : false,
             'showmsg'  => isset($config['showmsgicon'])  ? $config['showmsgicon']  : false,
             'showdot'  => isset($config['showonlineicon'])  ? $config['showonlineicon']  : true,
+            'showstats'=> isset($config['showinlinestats'])  ? $config['showinlinestats']  : true,
+            'separator'=> isset($config['separator'])  ? $config['separator']  : ' | ',
             'timefrom' => isset($config['timefrom']) ? $config['timefrom'] : 0,
         );
     }
@@ -124,7 +128,9 @@ class block_mymentees_mentee_element {
             $this->config['showdot']  ? $this->mentee_online() : '',
         );
 
-        $out .= "<div>" . implode(' | ', array_filter($icons)) . "</div>";
+        $out .= $this->config['showstats'] ? $this->inline_stats() : '';
+        
+        $out .= "<div class='mymentees_icons'>" . implode('<span>'.$this->config['separator'].'</span>', array_filter($icons)) . "</div>";
         $out .= '</div>';
         return $out;
     }
@@ -133,7 +139,6 @@ class block_mymentees_mentee_element {
         return '<div class="mymentees_pic">'.$this->OUTPUT->user_picture($this->record, array('size'=>30)).'</div>';
     }
     private function mentee_name() {
-        global $CFG;
         return '<div class="mymentees_name"><a href="'.$this->CFG->wwwroot.'/user/view.php?id='.
                             $this->record->instanceid.'&amp;course='.SITEID.'">'.fullname($this->record).'</a></div>';
     }
@@ -161,16 +166,51 @@ class block_mymentees_mentee_element {
     }
     private function mentee_online() {
         if ($this->record->lastaccess > $this->config['timefrom']) {
-            return $this->icon($this->OUTPUT->pix_url('t/go'), get_string('online', 'block_mymentees'));
+            $pic = 't/go';
+            $title = get_string('online', 'block_mymentees');
         } else {
-            return $this->icon($this->OUTPUT->pix_url('t/stop'), get_string('offline', 'block_mymentees'));
+            $pic = 't/stop';
+            $title = get_string('offline', 'block_mymentees');
         }
+        $ll = " (".get_string('lastlogin', 'block_mymentees').": ".$this->last_login().")";
+        return $this->icon($this->OUTPUT->pix_url($pic), $title.$ll);
     }
 
+    private function inline_stats() {
+        $stats = array(
+            'lastaccess'=> $this->last_login(),
+            'enrolled'  => array_pop($this->enrolled_courses()) ?: 0,
+            'completed' => array_pop($this->completed_courses()) ?: 0,
+        );
+        $stats_content = array(
+            $this->stat($stats['lastaccess'], get_string('lastlogin', 'block_mymentees')),
+            $this->stat($stats['enrolled'], get_string('enrolledcourses', 'block_mymentees')),
+            $this->stat($stats['completed'], get_string('completedcourses', 'block_mymentees')),
+        );
+        return "<div class='mymentees_stats'>".implode('',$stats_content)."</div>";
+    }
+
+    private function last_login() {
+        return userdate($this->record->lastaccess, '%d %b %Y');
+    }
+    private function stat($value, $title) {
+        return "<span class='mymentees_stats' title='{$title}'><label>{$title}:</label><span>{$value}</span></span>";
+    }
     private function icon($icon, $title='') {
         return "<img class='iconsmall' src='{$icon}' alt='{$title}' title='{$title}' />";
     }
     private function link($href, $title, $innerHTML) {
         return "<a class='mymentees_msg' href='{$this->CFG->wwwroot}{$href}' title='{$title}'>{$innerHTML}</a>";
+    }
+
+    private function enrolled_courses() {
+        return (array)$this->DB->get_record_sql('SELECT count(ue.enrolid)
+                       FROM {user_enrolments} ue
+                       WHERE ue.userid = ?', array($this->record->id));
+    }
+    private function completed_courses() {
+        return (array)$this->DB->get_record_sql('SELECT count(cc.course)
+                       FROM {course_completions} cc
+                       WHERE cc.userid = ?', array($this->record->id));
     }
 }

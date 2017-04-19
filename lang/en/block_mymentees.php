@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_mentees', language 'en', branch 'MOODLE_20_STABLE'
+ * Strings for component 'block_mymentees', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package   block_mentees
+ * @package   block_mymentees
  * @copyright  2012 Nathan Robbins (https://github.com/nrobbins)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -41,3 +41,9 @@ $string['showonlineicon'] = 'Show online/offline icon';
 $string['showonlineicon_desc'] = 'Check this to include an icon in the My mentees block showing whether the mentee user is online or not. This will be shown as a red or green dot.';
 $string['showinlinestats'] = 'Show inline stats';
 $string['showinlinestats_desc'] = 'Check this to include some top-level stats in the My mentees block, such as number of courses completed. This avoids the need for the mentor to click through each of her users to get an overview.';
+
+$string['configseparator'] = 'Icon separator';
+
+$string['lastlogin'] = 'Last login';
+$string['enrolledcourses'] = 'Enrolled';
+$string['completedcourses'] = 'Completed';
