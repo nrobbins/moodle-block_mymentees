@@ -21,3 +21,38 @@
 .mymentees_mentee:nth-child(odd) {
     background-color:#f2f2f2;
 }
+
+.mymentees_fullstats {
+    font-size:12px;
+}
+.mymentees_fullstats th {
+    font-weight:bold;
+}
+.mymentees_fullstats td {
+    text-align:center;
+    position:relative;
+}
+.mymentees_fullstats tr:nth-child(even) {
+    background-color:#f2f2f2;
+}
+#mymentees_coursestats tr:last-of-type {
+    font-weight:bold;
+}
+.mymentees_fullstats th.rotate {
+  /* Something you can count on */
+  height: 190px;
+  white-space: nowrap;
+}
+
+.mymentees_fullstats th.rotate > div {
+  transform: 
+    /* Magic Numbers */
+    translate(17px, 75px)
+    /* 45 is really 360 - 45 */
+    rotate(315deg);
+  width: 30px;
+}
+.mymentees_fullstats th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+}

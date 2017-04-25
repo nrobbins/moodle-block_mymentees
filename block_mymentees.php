@@ -77,6 +77,7 @@ class block_mymentees extends block_base {
                 $this->content->text .= $mentee_div->get_output();
             }
         }
+        $this->content->text .= "<hr><div><a href='{$CFG->wwwroot}/blocks/mymentees/stats.php'>Click to see mentee overview stats</a></div>";
 
         $this->content->footer = '';
 
