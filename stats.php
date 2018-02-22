@@ -110,9 +110,9 @@ if (count($courseStats)) {
     print "<h3>Course Access Stats</h3>";
     print "<table class='mymentees_fullstats' id='mymentees_coursestats'><tr><th>Course Name</th>";
     foreach ($periods as $period) {
-        print "<th class='rotate'><div><span>{$period['title']}</div></span></th>";
+        print "<th class='rotate'><div><span>{$period['title']}</span></div></th>";
     }
-    print "<th class='rotate'><div><span>Total</div></span></th>";
+    print "<th class='rotate'><div><span>Total</span></div></th>";
     print "</tr>";
 
     foreach ($courseStats as $courseStat) {
