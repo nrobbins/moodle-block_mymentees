@@ -131,7 +131,7 @@ if (count($userStats)) {
     print "<h3>User Access Stats</h3>";
     print "<table class='mymentees_fullstats' id='mymentees_userstats'><tr><th>User Name</th>";
     foreach ($coursenames as $cid=>$course) {
-        print "<th class='rotate'><div><span>{$course['name']}</div></span></th>";
+        print "<th class='rotate'><div><span>{$course['name']}</span></div></th>";
     }
     print "<th class='rotate'><div><span>Total</span></div></th>";
     print "</tr>";
