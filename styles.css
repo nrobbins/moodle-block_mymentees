@@ -4,3 +4,55 @@
 .mymentees_grades{border-style:none;background-color:transparent;background-repeat:no-repeat;background-position:bottom;color:transparent;cursor:pointer;height:16px;width:11px;margin:0;padding:0;}
 .mymentees_online{color:#0f0;}
 .mymentees_offline{color:#f00;}
+
+.mymentees_stats {
+    font-size:10px;
+    margin-right:4px;
+}
+.mymentees_stats label {
+    display:inline;
+    font-size:10px;
+    padding-right:3px;
+    cursor:default;
+}
+.mymentees_mentee>.mymentees_icons>* {
+    vertical-align:top;
+}
+.mymentees_mentee:nth-child(odd) {
+    background-color:#f2f2f2;
+}
+
+.mymentees_fullstats {
+    font-size:12px;
+}
+.mymentees_fullstats th {
+    font-weight:bold;
+}
+.mymentees_fullstats td {
+    text-align:center;
+    position:relative;
+}
+.mymentees_fullstats tr:nth-child(even) {
+    background-color:#f2f2f2;
+}
+#mymentees_coursestats tr:last-of-type {
+    font-weight:bold;
+}
+.mymentees_fullstats th.rotate {
+  /* Something you can count on */
+  height: 190px;
+  white-space: nowrap;
+}
+
+.mymentees_fullstats th.rotate > div {
+  transform: 
+    /* Magic Numbers */
+    translate(17px, 75px)
+    /* 45 is really 360 - 45 */
+    rotate(315deg);
+  width: 30px;
+}
+.mymentees_fullstats th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+}
